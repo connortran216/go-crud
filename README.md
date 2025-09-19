@@ -1,32 +1,29 @@
 # Go CRUD - My First RESTful API with Golang
 
-A clean and modern RESTful API built with Go, featuring a service-oriented architecture and complete CRUD operations for blog posts.
-
-
+A clean and modern RESTful API built with Go, featuring a view-based architecture with structured input/output schemas and complete CRUD operations for blog posts.
 
 ## 📋 API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/health` | Health check |
-| POST | `/posts` | Create a new post |
-| GET | `/posts` | Get all posts |
-| GET | `/posts/:id` | Get post by ID |
-| PUT | `/posts/:id` | Update entire post |
-| PATCH | `/posts/:id` | Partial update post |
-| DELETE | `/posts/:id` | Delete post |
+| Method | Endpoint | Description | Request Body | Response |
+|--------|----------|-------------|--------------|----------|
+| GET | `/health` | Health check | - | `{"status": "healthy", "service": "go-crud-api"}` |
+| POST | `/posts` | Create a new post | `CreatePostRequest` | `PostResponse` |
+| GET | `/posts?page=1&limit=10` | Get posts with pagination | Query params | `ListPostsResponse` |
+| GET | `/posts/:id` | Get post by ID | - | `PostResponse` |
+| PUT | `/posts/:id` | Update entire post | `UpdatePostRequest` | `PostResponse` |
+| PATCH | `/posts/:id` | Partial update post | `PatchPostRequest` | `PostResponse` |
+| DELETE | `/posts/:id` | Delete post | - | `MessageResponse` |
 
 ## 🏗️ Project Structure
 
 ```
-go-crud/
-├── controllers/           # HTTP request handlers (legacy)
-│   └── controlPost.go    
+go-crud/ 
 ├── services/             # Business logic layer
 │   └── post_service.go   
-├── viewsets/             # Generic API viewsets
-│   ├── base.go          # Generic CRUD operations
-│   └── post_viewset.go  # Post-specific viewset
+├── views/                # API endpoint handlers
+│   └── post_views.go     # Post-specific CRUD endpoints
+├── schemas/              # Input/output schemas
+│   └── post_schemas.go   # Post request/response schemas
 ├── models/              # Data models
 │   └── postModel.go     
 ├── initializers/        # Application initialization
@@ -44,9 +41,9 @@ go-crud/
 ### Architecture Layers
 
 1. **Models** (`models/`): Define data structures and database schemas
-2. **Services** (`services/`): Contain business logic and data validation
-3. **ViewSets** (`viewsets/`): Handle HTTP requests/responses with generic CRUD operations
-4. **Controllers** (`controllers/`): Legacy layer, being replaced by ViewSets
+2. **Schemas** (`schemas/`): Input/output data transfer objects with validation
+3. **Services** (`services/`): Contain business logic and data validation
+4. **Views** (`views/`): Handle HTTP requests/responses for specific models
 5. **Initializers** (`initializers/`): Handle app startup and configuration
 
 ## 🛠️ Technologies Used
@@ -56,6 +53,7 @@ go-crud/
 - **GORM** - ORM library for Go
 - **PostgreSQL** - Database
 - **godotenv** - Environment variable management
+- **go-playground/validator** - Request validation
 
 ## ⚡ Getting Started
 
@@ -146,21 +144,29 @@ go mod download    # Download modules to local cache
 
 ## 🎯 Key Features Explained
 
-### Generic ViewSet Pattern
-The project uses a generic ViewSet pattern that allows for reusable CRUD operations:
+### View-Based Architecture
+The project uses a clean view-based pattern for organized API endpoints:
 
-- **BaseViewSet**: Provides generic CRUD operations for any model
-- **Type Safety**: Uses Go generics for compile-time type checking
-- **Standardized Responses**: Consistent API response format
-- **Easy Extension**: Simple to add custom endpoints
+- **Model-Specific Views**: Dedicated view files for each model (e.g., `post_views.go`)
+- **Standardized Responses**: Consistent API response format across all endpoints
+- **Clean Structure**: Easy to maintain and extend with new models
+- **Route Registration**: Automatic route setup for CRUD operations
+
+### Schema-Driven Design
+Structured input/output handling with validation:
+
+- **Input Schemas**: `CreatePostRequest`, `UpdatePostRequest`, `PatchPostRequest`
+- **Output Schemas**: `PostResponse`, `ListPostsResponse`, `ErrorResponse`
+- **Data Transformation**: `ToModel()` methods convert requests to models
+- **Validation Ready**: Built-in validation tags using go-playground/validator
 
 ### Service Layer
 Clean separation of business logic:
 
-- **Validation**: Input validation and business rules
+- **Business Logic**: Input validation and business rules
 - **Error Handling**: Proper error messages and HTTP status codes
 - **Database Operations**: Abstracted database interactions
-- **Reusability**: Services can be used across different controllers
+- **Reusability**: Services can be used across different views
 
 ### Database Integration
 - **GORM ORM**: Powerful and developer-friendly ORM
@@ -168,13 +174,69 @@ Clean separation of business logic:
 - **Connection Pooling**: Efficient database connection management
 - **Environment Configuration**: Database settings from environment variables
 
+### Pagination Support
+- **Query Parameters**: `page` and `limit` parameters for list endpoints
+- **Default Values**: Automatic fallback to page=1, limit=10
+- **Total Count**: Returns total records for proper pagination UI
 
+
+
+## 📚 API Schema Examples
+
+### Request Schemas
+
+**CreatePostRequest / UpdatePostRequest**
+```json
+{
+  "title": "My Blog Post",
+  "content": "This is the content of my blog post"
+}
+```
+
+**PatchPostRequest** (partial update)
+```json
+{
+  "title": "Updated Title"
+}
+```
+
+### Response Schemas
+
+**PostResponse**
+```json
+{
+  "data": {
+    "ID": 1,
+    "CreatedAt": "2024-01-01T12:00:00Z",
+    "UpdatedAt": "2024-01-01T12:00:00Z",
+    "DeletedAt": null,
+    "title": "My Blog Post",
+    "content": "This is the content"
+  },
+  "message": "Post created successfully"
+}
+```
+
+**ListPostsResponse**
+```json
+{
+  "data": [
+    {
+      "ID": 1,
+      "title": "Post 1",
+      "content": "Content 1"
+    }
+  ],
+  "limit": 10,
+  "page": 1,
+  "total": 25
+}
+```
 
 ## 🔮 Future Enhancements
 
 - [ ] Add authentication and authorization
-- [ ] Implement pagination for list endpoints
-- [ ] Add request validation middleware
+- [x] ~~Implement pagination for list endpoints~~ ✅ **Completed**
 - [ ] Include API documentation with Swagger
 - [ ] Add unit and integration tests
 - [ ] Implement logging middleware

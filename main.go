@@ -2,7 +2,7 @@ package main
 
 import (
 	"go-crud/initializers"
-	"go-crud/viewsets"
+	"go-crud/views"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,11 +15,11 @@ func init() {
 func main() {
 	router := gin.Default()
 
-	// Initialize ViewSets
-	postViewSet := viewsets.NewPostViewSet()
+	// Initialize Views
+	postViews := views.NewPostViews()
 
-	// Register routes using ViewSet pattern
-	postViewSet.RegisterRoutes(router)
+	// Register routes using View pattern
+	postViews.RegisterRoutes(router)
 
 	// Add a health check endpoint
 	router.GET("/health", func(c *gin.Context) {

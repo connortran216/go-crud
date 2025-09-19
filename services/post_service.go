@@ -4,6 +4,7 @@ import (
 	"errors"
 	"go-crud/initializers"
 	"go-crud/models"
+	"go-crud/schemas"
 
 	"gorm.io/gorm"
 )
@@ -60,6 +61,28 @@ func (s *PostService) GetAll() ([]models.Post, error) {
 	}
 
 	return posts, nil
+}
+
+// GetPaginated retrieves posts with pagination
+func (s *PostService) GetWithPagination(query schemas.ListPostsQueryParams) ([]models.Post, int64, error) {
+	var posts []models.Post
+	var total int64
+	
+	// Get total count
+	if err := s.db.Model(&models.Post{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+	
+	// Calculate offset
+	offset := (query.Page - 1) * query.Limit
+	
+	// Get paginated results
+	result := s.db.Limit(query.Limit).Offset(offset).Find(&posts)
+	if result.Error != nil {
+		return nil, 0, result.Error
+	}
+	
+	return posts, total, nil
 }
 
 // Update updates an existing post
