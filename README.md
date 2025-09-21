@@ -99,6 +99,43 @@ go-crud/
 
 The API will be available at `http://localhost:8080`
 
+## 🧪 Running Tests
+
+This project includes unit tests for the API endpoints using a test suite pattern.
+
+### Test Setup
+
+Tests are located in the `test/` directory and use:
+- **TestSuite pattern** for setup and cleanup
+- **Real database** for integration testing
+- **Structured test organization** similar to Django TestCase
+
+### Running Tests
+
+```bash
+# Run all tests with verbose output
+go test -v ./test/
+
+# Run specific test
+go test -v ./test/ -run TestCreatePost_Success
+
+# Run tests from test directory
+cd test && go test -v
+```
+
+### Test Structure
+
+```
+test/
+└── posts_views_test.go    # Post API endpoint tests
+```
+
+The test suite automatically:
+- Sets up the router using the same configuration as production
+- Initializes database connection and cleans test data
+- Runs tests against real HTTP endpoints
+- Cleans up after each test
+
 ## 📖 How to Generate go.mod and go.sum
 
 ### Creating go.mod
@@ -238,7 +275,7 @@ Clean separation of business logic:
 - [ ] Add authentication and authorization
 - [x] ~~Implement pagination for list endpoints~~ ✅ **Completed**
 - [ ] Include API documentation with Swagger
-- [ ] Add unit and integration tests
+- [x] ~~Add unit and integration tests~~ ✅ **Completed**
 - [ ] Implement logging middleware
 - [ ] Add rate limiting
 - [ ] Docker containerization
