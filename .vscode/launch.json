@@ -8,13 +8,20 @@
             "name": "Debug REST API Server",
             "type": "go",
             "request": "launch",
-            "mode": "auto",
-            "program": "${workspaceFolder}/main.go",
-            "env": {},
-            "args": [],
-            "showLog": true,
+            "mode": "test",
+            "program": "${workspaceFolder}/test/",
+            "cwd": "${workspaceFolder}",
             "console": "integratedTerminal"
         },
+        // {
+        //     "name": "Debug REST API Server",
+        //     "type": "go",
+        //     "request": "launch",
+        //     "mode": "debug",
+        //     "program": "${workspaceFolder}/main.go",
+        //     "cwd": "${workspaceFolder}",
+        //     "console": "integratedTerminal"
+        // },
         // {
         //     "name": "Launch Package",
         //     "type": "go",
