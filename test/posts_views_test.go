@@ -7,12 +7,13 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"strconv"
 
 	"github.com/stretchr/testify/assert"
 )
 
 
-func TestCreatePost_Success(t *testing.T) {
+func TestCreatePostSuccess(t *testing.T) {
 	suite := NewTestSuite(t)
 	defer suite.TearDown()
 	
@@ -38,7 +39,8 @@ func TestCreatePost_Success(t *testing.T) {
 	assert.NotZero(t, response.Data.ID)
 }
 
-func TestCreatePost_ValidationError(t *testing.T) {
+// TODO: Fix this case that API return InternalServerError instead of BadRequest (500 code vs 400 code)
+func TestCreatePostValidationError(t *testing.T) {
 	suite := NewTestSuite(t)
 	defer suite.TearDown()
 	
@@ -59,4 +61,112 @@ func TestCreatePost_ValidationError(t *testing.T) {
 	var response schemas.ErrorResponse
 	json.Unmarshal(w.Body.Bytes(), &response)
 	assert.Contains(t, response.Error, "title is required")
+}
+
+
+func TestGetPostByIDSuccess(t *testing.T) {
+	suite := NewTestSuite(t)
+	defer suite.TearDown()
+
+	// Create mock data Post
+	post := PostFactory()
+	req, _ := http.NewRequest("GET", "/posts/"+strconv.FormatUint(uint64(post.ID), 10), nil)
+	req.Header.Set("Content-Type", "application/json")
+
+	w := httptest.NewRecorder()
+	suite.router.ServeHTTP(w, req)
+
+	var response schemas.PostResponse
+	json.Unmarshal(w.Body.Bytes(), &response)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, post.Title, response.Data.Title)
+	assert.Equal(t, post.Content, response.Data.Content)
+}
+
+func TestGetPostByIDDataDoesNotExist(t *testing.T) {
+	suite := NewTestSuite(t)
+	defer suite.TearDown()
+
+	req, _ := http.NewRequest("GET", "/posts/9999", nil)
+	req.Header.Set("Content-Type", "application/json")
+
+	w := httptest.NewRecorder()
+	suite.router.ServeHTTP(w, req)
+
+	var response schemas.ErrorResponse
+	json.Unmarshal(w.Body.Bytes(), &response)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+	assert.Contains(t, response.Error, "post not found")
+}
+
+func TestListPostsSuccessWithDefaultPagination(t *testing.T) {
+	suite := NewTestSuite(t)
+	defer suite.TearDown()
+
+	// Create mock data Posts
+	for i := 0; i < 10; i++ {
+		PostFactory()
+	}
+
+	req, _ := http.NewRequest("GET", "/posts", nil)
+	req.Header.Set("Content-Type", "application/json")
+
+	w := httptest.NewRecorder()
+	suite.router.ServeHTTP(w, req)
+
+	var response schemas.ListPostsResponse
+	json.Unmarshal(w.Body.Bytes(), &response)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.GreaterOrEqual(t, len(response.Data), 10)
+	assert.Equal(t, 10, response.Limit)
+	assert.Equal(t, 1, response.Page)
+	assert.GreaterOrEqual(t, response.Total, 10)
+}
+
+func TestListPostsSuccessWithCustomPagination(t *testing.T) {
+	suite := NewTestSuite(t)
+	defer suite.TearDown()
+
+	// Create mock data Posts
+	for i := 0; i < 10; i++ {
+		PostFactory()
+	}
+
+	req, _ := http.NewRequest("GET", "/posts?page=2&limit=5", nil)
+	req.Header.Set("Content-Type", "application/json")
+
+	w := httptest.NewRecorder()
+	suite.router.ServeHTTP(w, req)
+
+	var response schemas.ListPostsResponse
+	json.Unmarshal(w.Body.Bytes(), &response)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.GreaterOrEqual(t, len(response.Data), 5)
+	assert.Equal(t, 5, response.Limit)
+	assert.Equal(t, 2, response.Page)
+	assert.GreaterOrEqual(t, response.Total, 10)
+}
+
+func TestListPostsShouldReturnDefaultPaginationWhenInvalidQueryParams(t *testing.T) {
+	suite := NewTestSuite(t)
+	defer suite.TearDown()
+
+	req, _ := http.NewRequest("GET", "/posts?page=abc&limit=xyz", nil)
+	req.Header.Set("Content-Type", "application/json")
+
+	w := httptest.NewRecorder()
+	suite.router.ServeHTTP(w, req)
+
+	var response schemas.ListPostsResponse
+	json.Unmarshal(w.Body.Bytes(), &response)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.GreaterOrEqual(t, len(response.Data), 0)
+	assert.Equal(t, 10, response.Limit) // Default limit
+	assert.Equal(t, 1, response.Page)   // Default page
+	assert.GreaterOrEqual(t, response.Total, 0)
 }
