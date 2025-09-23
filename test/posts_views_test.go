@@ -248,6 +248,78 @@ func TestUpdatePostFailWhenDataIsInvalid(t *testing.T) {
 	assert.Contains(t, response.Error, "title is required")
 }
 
+func TestPartiallyUpdatePostSuccess(t *testing.T) {
+	suite := NewTestSuite(t)
+	defer suite.TearDown()
+
+	// Create mock data Post
+	post := PostFactory()
+	
+	requestBody := map[string]string{
+		"content": "Partially Updated Content",
+	}
+	
+	jsonData, _ := json.Marshal(requestBody)
+	req, _ := http.NewRequest("PATCH", "/posts/"+strconv.FormatUint(uint64(post.ID), 10), bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+
+	w := httptest.NewRecorder()
+	suite.router.ServeHTTP(w, req)
+
+	var response schemas.PostResponse
+	json.Unmarshal(w.Body.Bytes(), &response)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, post.Title, response.Data.Title) // Title should remain unchanged
+	assert.Equal(t, "Partially Updated Content", response.Data.Content)
+	assert.NotZero(t, response.Data.ID)
+}
+
+func TestPartiallyUpdatePostFailWhenDataDoesNotExist(t *testing.T) {
+	suite := NewTestSuite(t)
+	defer suite.TearDown()
+	
+	requestBody := map[string]string{
+		"content": "Partially Updated Content",
+	}
+	
+	jsonData, _ := json.Marshal(requestBody)
+	req, _ := http.NewRequest("PATCH", "/posts/9999", bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+
+	w := httptest.NewRecorder()
+	suite.router.ServeHTTP(w, req)
+
+	var response schemas.ErrorResponse
+	json.Unmarshal(w.Body.Bytes(), &response)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+	assert.Contains(t, response.Error, "post not found")
+}
+
+func TestPartiallyUpdatePostFailInvalidData(t *testing.T) {
+	suite := NewTestSuite(t)
+	defer suite.TearDown()
+	// Create mock data Post
+	post := PostFactory()
+	
+	requestBody := map[string]string{
+		"title": "", // Invalid empty title
+	}
+	
+	jsonData, _ := json.Marshal(requestBody)
+	req, _ := http.NewRequest("PATCH", "/posts/"+strconv.FormatUint(uint64(post.ID), 10), bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+
+	w := httptest.NewRecorder()
+	suite.router.ServeHTTP(w, req)
+
+	var response schemas.ErrorResponse
+	json.Unmarshal(w.Body.Bytes(), &response)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.Contains(t, response.Error, "title cannot be empty")
+}
 
 func TestDeletePostSuccess(t *testing.T) {
 	suite := NewTestSuite(t)
