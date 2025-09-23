@@ -39,7 +39,6 @@ func TestCreatePostSuccess(t *testing.T) {
 	assert.NotZero(t, response.Data.ID)
 }
 
-// TODO: Fix this case that API return InternalServerError instead of BadRequest (500 code vs 400 code)
 func TestCreatePostValidationError(t *testing.T) {
 	suite := NewTestSuite(t)
 	defer suite.TearDown()
@@ -56,11 +55,11 @@ func TestCreatePostValidationError(t *testing.T) {
 	w := httptest.NewRecorder()
 	suite.router.ServeHTTP(w, req)
 	
-	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
 	
 	var response schemas.ErrorResponse
 	json.Unmarshal(w.Body.Bytes(), &response)
-	assert.Contains(t, response.Error, "title is required")
+	assert.Contains(t, response.Error, "Validation failed: Key: 'CreatePostRequest.Title' Error:Field validation for 'Title' failed on the 'required' tag")
 }
 
 
@@ -244,8 +243,8 @@ func TestUpdatePostFailWhenDataIsInvalid(t *testing.T) {
 	var response schemas.ErrorResponse
 	json.Unmarshal(w.Body.Bytes(), &response)
 
-	assert.Equal(t, http.StatusNotFound, w.Code)
-	assert.Contains(t, response.Error, "title is required")
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.Contains(t, response.Error, "Validation failed: Key: 'UpdatePostRequest.Title' Error:Field validation for 'Title' failed on the 'required' tag")
 }
 
 func TestPartiallyUpdatePostSuccess(t *testing.T) {
@@ -318,7 +317,7 @@ func TestPartiallyUpdatePostFailInvalidData(t *testing.T) {
 	json.Unmarshal(w.Body.Bytes(), &response)
 
 	assert.Equal(t, http.StatusBadRequest, w.Code)
-	assert.Contains(t, response.Error, "title cannot be empty")
+	assert.Contains(t, response.Error, "Validation failed: Key: 'PatchPostRequest.Title' Error:Field validation for 'Title' failed on the 'min' tag")
 }
 
 func TestDeletePostSuccess(t *testing.T) {

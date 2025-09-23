@@ -112,6 +112,7 @@ Tests are located in the `test/` directory and use:
 
 ### Running Tests
 
+#### Standard Go Testing
 ```bash
 # Run all tests with verbose output
 go test -v ./test/
@@ -121,6 +122,25 @@ go test -v ./test/ -run TestCreatePost_Success
 
 # Run tests from test directory
 cd test && go test -v
+```
+
+#### Enhanced Testing with gotestsum
+For better test output formatting and reporting, use `gotestsum`:
+
+```bash
+# Install gotestsum (if not already installed)
+go install gotest.tools/gotestsum@latest
+
+# Run tests with enhanced formatting
+gotestsum --format=short-verbose ./test -- -count=1 -v
+
+# Run specific test with gotestsum
+gotestsum --format=short-verbose ./test -- -count=1 -v -run TestCreatePost_Success
+
+# Other useful gotestsum formats
+gotestsum --format=pkgname ./test        # Package-level summary
+gotestsum --format=testname ./test       # Show test names only
+gotestsum --format=dots ./test           # Minimal dot output
 ```
 
 ### Test Structure

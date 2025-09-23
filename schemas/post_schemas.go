@@ -5,7 +5,8 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-var validate *validator.Validate
+
+var validate = validator.New()
 
 // Query Parameters
 type ListPostsQueryParams struct {
@@ -20,6 +21,10 @@ type CreatePostRequest struct {
 }
 
 // Method for CreatePostRequest struct
+func (r CreatePostRequest) Validate() error {
+	return validate.Struct(r)
+}
+
 func (r CreatePostRequest) ToModel() models.Post {
 	return models.Post{
 		Title:   r.Title,
@@ -33,6 +38,10 @@ type UpdatePostRequest struct {
 }
 
 // Method for UpdatePostRequest struct
+func (r UpdatePostRequest) Validate() error {
+	return validate.Struct(r)
+}
+
 func (r UpdatePostRequest) ToModel() models.Post {
 	return models.Post{
 		Title:   r.Title,
@@ -46,6 +55,10 @@ type PatchPostRequest struct {
 }
 
 // Method for PatchPostRequest struct
+func (r PatchPostRequest) Validate() error {
+	return validate.Struct(r)
+}
+
 func (r PatchPostRequest) IsEmpty() bool {
 	return r.Title == nil && r.Content == nil
 }

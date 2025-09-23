@@ -29,6 +29,13 @@ func (v *PostViews) CreatePost(c *gin.Context) {
 		return
 	}
 
+	if err := input.Validate(); err != nil {
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{
+			Error: fmt.Sprintf("Validation failed: %v", err),
+		})
+		return
+	}
+
 	result, err := v.service.Create(input.ToModel())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{
@@ -114,6 +121,13 @@ func (v *PostViews) UpdatePost(c *gin.Context) {
 		return
 	}
 
+	if err := input.Validate(); err != nil {
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{
+			Error: fmt.Sprintf("Validation failed: %v", err),
+		})
+		return
+	}
+
 	result, err := v.service.Update(uint(id), input.ToModel())
 	if err != nil {
 		c.JSON(http.StatusNotFound, schemas.ErrorResponse{
@@ -149,6 +163,13 @@ func (v *PostViews) PartialUpdatePost(c *gin.Context) {
 	if input.IsEmpty() {
 		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{
 			Error: "No data provided for update",
+		})
+		return
+	}
+
+	if err := input.Validate(); err != nil {
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{
+			Error: fmt.Sprintf("Validation failed: %v", err),
 		})
 		return
 	}
