@@ -170,3 +170,117 @@ func TestListPostsShouldReturnDefaultPaginationWhenInvalidQueryParams(t *testing
 	assert.Equal(t, 1, response.Page)   // Default page
 	assert.GreaterOrEqual(t, response.Total, 0)
 }
+
+func TestUpdatePostSuccess(t *testing.T) {
+	suite := NewTestSuite(t)
+	defer suite.TearDown()
+
+	// Create mock data Post
+	post := PostFactory()
+	
+	requestBody := map[string]string{
+		"title":   "Updated Title",
+		"content": "Updated Content",
+	}
+	
+	jsonData, _ := json.Marshal(requestBody)
+	req, _ := http.NewRequest("PUT", "/posts/"+strconv.FormatUint(uint64(post.ID), 10), bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+
+	w := httptest.NewRecorder()
+	suite.router.ServeHTTP(w, req)
+
+	var response schemas.PostResponse
+	json.Unmarshal(w.Body.Bytes(), &response)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "Updated Title", response.Data.Title)
+	assert.Equal(t, "Updated Content", response.Data.Content)
+	assert.NotZero(t, response.Data.ID)
+}
+
+func TestUpdatePostFailWhenDataDoesNotExist(t *testing.T) {
+	suite := NewTestSuite(t)
+	defer suite.TearDown()
+	
+	requestBody := map[string]string{
+		"title":   "Updated Title",
+		"content": "Updated Content",
+	}
+	
+	jsonData, _ := json.Marshal(requestBody)
+	req, _ := http.NewRequest("PUT", "/posts/9999", bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+
+	w := httptest.NewRecorder()
+	suite.router.ServeHTTP(w, req)
+
+	var response schemas.ErrorResponse
+	json.Unmarshal(w.Body.Bytes(), &response)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+	assert.Contains(t, response.Error, "post not found")
+}
+
+func TestUpdatePostFailWhenDataIsInvalid(t *testing.T) {
+	suite := NewTestSuite(t)
+	defer suite.TearDown()
+
+	// Create mock data Post
+	post := PostFactory()
+	
+	requestBody := map[string]string{
+		"author":   "", // Invalid un-exist field
+		"content": "Updated Content",
+	}
+	
+	jsonData, _ := json.Marshal(requestBody)
+	req, _ := http.NewRequest("PUT", "/posts/"+strconv.FormatUint(uint64(post.ID), 10), bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+
+	w := httptest.NewRecorder()
+	suite.router.ServeHTTP(w, req)
+
+	var response schemas.ErrorResponse
+	json.Unmarshal(w.Body.Bytes(), &response)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+	assert.Contains(t, response.Error, "title is required")
+}
+
+
+func TestDeletePostSuccess(t *testing.T) {
+	suite := NewTestSuite(t)
+	defer suite.TearDown()
+
+	// Create mock data Post
+	post := PostFactory()
+	req, _ := http.NewRequest("DELETE", "/posts/"+strconv.FormatUint(uint64(post.ID), 10), nil)
+	req.Header.Set("Content-Type", "application/json")
+
+	w := httptest.NewRecorder()
+	suite.router.ServeHTTP(w, req)
+
+	var response schemas.MessageResponse
+	json.Unmarshal(w.Body.Bytes(), &response)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "Post deleted successfully", response.Message)
+}
+
+func TestDeletePostFailWhenDataDoesNotExist(t *testing.T) {
+	suite := NewTestSuite(t)
+	defer suite.TearDown()
+
+	req, _ := http.NewRequest("DELETE", "/posts/9999", nil)
+	req.Header.Set("Content-Type", "application/json")
+
+	w := httptest.NewRecorder()
+	suite.router.ServeHTTP(w, req)
+
+	var response schemas.ErrorResponse
+	json.Unmarshal(w.Body.Bytes(), &response)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+	assert.Contains(t, response.Error, "post not found")
+}
