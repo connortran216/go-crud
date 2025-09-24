@@ -5,6 +5,8 @@ import (
 	"go-crud/views"
 
 	"github.com/gin-gonic/gin"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	swaggerFiles "github.com/swaggo/files"
 )
 
 // SetupRouter creates and configures the Gin router
@@ -24,6 +26,9 @@ func SetupRouter() *gin.Engine {
 			"service": "go-crud-api",
 		})
 	})
+
+	// Swagger endpoint
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return router
 }

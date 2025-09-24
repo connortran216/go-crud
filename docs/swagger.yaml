@@ -1,0 +1,215 @@
+basePath: /
+definitions:
+  models.Post:
+    properties:
+      content:
+        example: This is the content of my first post
+        type: string
+      created_at:
+        example: "2023-01-01T00:00:00Z"
+        type: string
+      id:
+        example: 1
+        type: integer
+      title:
+        example: My First Post
+        type: string
+      updated_at:
+        example: "2023-01-01T00:00:00Z"
+        type: string
+    type: object
+  schemas.CreatePostRequest:
+    properties:
+      content:
+        example: This is the content of my new post
+        minLength: 1
+        type: string
+      title:
+        example: My New Post
+        maxLength: 255
+        minLength: 1
+        type: string
+    required:
+    - content
+    - title
+    type: object
+  schemas.ListPostsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.Post'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+    type: object
+  schemas.MessageResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  schemas.PatchPostRequest:
+    properties:
+      content:
+        example: Partially updated content
+        minLength: 1
+        type: string
+      title:
+        example: Partially Updated Title
+        maxLength: 255
+        minLength: 1
+        type: string
+    type: object
+  schemas.PostResponse:
+    properties:
+      data:
+        $ref: '#/definitions/models.Post'
+      message:
+        type: string
+    type: object
+  schemas.UpdatePostRequest:
+    properties:
+      content:
+        example: Updated post content
+        minLength: 1
+        type: string
+      title:
+        example: Updated Post Title
+        maxLength: 255
+        minLength: 1
+        type: string
+    required:
+    - content
+    - title
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: A simple CRUD API for posts built with Go and Gin
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: Go CRUD API
+  version: "1.0"
+paths:
+  /posts:
+    get:
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.ListPostsResponse'
+      summary: List posts
+      tags:
+      - posts
+    post:
+      parameters:
+      - description: Post data
+        in: body
+        name: post
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreatePostRequest'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/schemas.PostResponse'
+      summary: Create post
+      tags:
+      - posts
+  /posts/{id}:
+    delete:
+      parameters:
+      - description: Post ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.MessageResponse'
+      summary: Delete post
+      tags:
+      - posts
+    get:
+      parameters:
+      - description: Post ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.PostResponse'
+      summary: Get post
+      tags:
+      - posts
+    patch:
+      parameters:
+      - description: Post ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Patch data
+        in: body
+        name: post
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.PatchPostRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.PostResponse'
+      summary: Patch post
+      tags:
+      - posts
+    put:
+      parameters:
+      - description: Post ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Post data
+        in: body
+        name: post
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UpdatePostRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.PostResponse'
+      summary: Update post
+      tags:
+      - posts
+schemes:
+- http
+- https
+swagger: "2.0"

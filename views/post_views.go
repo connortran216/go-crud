@@ -20,6 +20,11 @@ func NewPostViews() *PostViews {
 	}
 }
 
+// @Summary Create post
+// @Tags posts
+// @Param post body schemas.CreatePostRequest true "Post data"
+// @Success 201 {object} schemas.PostResponse
+// @Router /posts [post]
 func (v *PostViews) CreatePost(c *gin.Context) {
 	var input schemas.CreatePostRequest
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -51,6 +56,12 @@ func (v *PostViews) CreatePost(c *gin.Context) {
 	c.JSON(http.StatusCreated, response)
 }
 
+// @Summary List posts
+// @Tags posts
+// @Param page query int false "Page number" default(1)
+// @Param limit query int false "Items per page" default(10)
+// @Success 200 {object} schemas.ListPostsResponse
+// @Router /posts [get]
 func (v *PostViews) ListPosts(c *gin.Context) {
 	var query schemas.ListPostsQueryParams
 	query.Page, _ = strconv.Atoi(c.Query("page"))
@@ -81,6 +92,11 @@ func (v *PostViews) ListPosts(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// @Summary Get post
+// @Tags posts
+// @Param id path int true "Post ID"
+// @Success 200 {object} schemas.PostResponse
+// @Router /posts/{id} [get]
 func (v *PostViews) GetPost(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
@@ -104,6 +120,12 @@ func (v *PostViews) GetPost(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// @Summary Update post
+// @Tags posts
+// @Param id path int true "Post ID"
+// @Param post body schemas.UpdatePostRequest true "Post data"
+// @Success 200 {object} schemas.PostResponse
+// @Router /posts/{id} [put]
 func (v *PostViews) UpdatePost(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
@@ -143,6 +165,12 @@ func (v *PostViews) UpdatePost(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// @Summary Patch post
+// @Tags posts
+// @Param id path int true "Post ID"
+// @Param post body schemas.PatchPostRequest true "Patch data"
+// @Success 200 {object} schemas.PostResponse
+// @Router /posts/{id} [patch]
 func (v *PostViews) PartialUpdatePost(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
@@ -196,6 +224,11 @@ func (v *PostViews) PartialUpdatePost(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// @Summary Delete post
+// @Tags posts
+// @Param id path int true "Post ID"
+// @Success 200 {object} schemas.MessageResponse
+// @Router /posts/{id} [delete]
 func (v *PostViews) DeletePost(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
