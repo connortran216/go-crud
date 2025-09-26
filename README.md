@@ -99,9 +99,15 @@ go-crud/
 
 The API will be available at `http://localhost:8080`
 
+## Access Swagger Docs (After start server)
+
+   `http://localhost:8080/swagger/index.html`
+
+<img src="docs/swagger_docs.png" width="500" />
+
 ## 🧪 Running Tests
 
-This project includes unit tests for the API endpoints using a test suite pattern.
+This project includes unit tests for the   API endpoints using a test suite pattern.
 
 ### Test Setup
 
@@ -236,65 +242,11 @@ Clean separation of business logic:
 - **Default Values**: Automatic fallback to page=1, limit=10
 - **Total Count**: Returns total records for proper pagination UI
 
-
-
-## 📚 API Schema Examples
-
-### Request Schemas
-
-**CreatePostRequest / UpdatePostRequest**
-```json
-{
-  "title": "My Blog Post",
-  "content": "This is the content of my blog post"
-}
-```
-
-**PatchPostRequest** (partial update)
-```json
-{
-  "title": "Updated Title"
-}
-```
-
-### Response Schemas
-
-**PostResponse**
-```json
-{
-  "data": {
-    "ID": 1,
-    "CreatedAt": "2024-01-01T12:00:00Z",
-    "UpdatedAt": "2024-01-01T12:00:00Z",
-    "DeletedAt": null,
-    "title": "My Blog Post",
-    "content": "This is the content"
-  },
-  "message": "Post created successfully"
-}
-```
-
-**ListPostsResponse**
-```json
-{
-  "data": [
-    {
-      "ID": 1,
-      "title": "Post 1",
-      "content": "Content 1"
-    }
-  ],
-  "limit": 10,
-  "page": 1,
-  "total": 25
-}
-```
-
 ## 🔮 Future Enhancements
 
 - [ ] Add authentication and authorization
 - [x] ~~Implement pagination for list endpoints~~ ✅ **Completed**
-- [ ] Include API documentation with Swagger
+- [x] ~~Include API documentation with Swagger~~ ✅ **Completed**
 - [x] ~~Add unit and integration tests~~ ✅ **Completed**
 - [ ] Implement logging middleware
 - [ ] Add rate limiting
