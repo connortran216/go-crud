@@ -29,7 +29,8 @@ func (suite *BaseTestSuite) SetUp() {
 }
 
 func (suite *BaseTestSuite) CleanUp() {
-	initializers.DB.Where("title LIKE ?", "Test%").Delete(&models.Post{})
+	initializers.DB.Where("1 = 1").Delete(&models.Post{})
+	initializers.DB.Where("1 = 1").Delete(&models.User{})
 }
 
 func (suite *BaseTestSuite) TearDown() {

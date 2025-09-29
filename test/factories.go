@@ -35,3 +35,32 @@ func PostFactory(opts ...PostOption) models.Post {
 	initializers.DB.Create(post)
 	return *post
 }
+
+type UserOption func(*models.User)
+
+func WithEmail(email string) UserOption {
+	return func(u *models.User) {
+		u.Email = email
+	}
+}
+
+func WithName(name string) UserOption {
+	return func(u *models.User) {
+		u.Name = name
+	}
+}
+
+func UserFactory(opts ...UserOption) models.User {
+	user := &models.User{
+		Name:  gofakeit.Name(),
+		Email: gofakeit.Email(),
+		HashedPassword: "hashedPassword", 
+	}
+
+	for _, opt := range opts {
+		opt(user)
+	}
+
+	initializers.DB.Create(user)
+	return *user
+}
