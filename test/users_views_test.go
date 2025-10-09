@@ -126,82 +126,82 @@ func TestGetUserByIDNotFound(t *testing.T) {
 	assert.Contains(t, response.Error, "user not found")
 }
 
-// func TestPartialUpdateUserSuccess(t *testing.T) {
-// 	suite := NewTestSuite(t)
-// 	defer suite.TearDown()
+func TestPartialUpdateUserSuccess(t *testing.T) {
+	suite := NewTestSuite(t)
+	defer suite.TearDown()
 
-// 	user := UserFactory()
+	user := UserFactory()
 
-// 	requestBody := map[string]string{
-// 		"name": "Updated Name",
-// 	}
+	requestBody := map[string]string{
+		"name": "Updated Name",
+	}
 
-// 	jsonData, _ := json.Marshal(requestBody)
+	jsonData, _ := json.Marshal(requestBody)
 
-// 	req, _ := http.NewRequest("PATCH", "/users/"+strconv.FormatUint(uint64(user.ID), 10), bytes.NewBuffer(jsonData))
-// 	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest("PATCH", "/users/"+strconv.FormatUint(uint64(user.ID), 10), bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
 
-// 	w := httptest.NewRecorder()
-// 	suite.router.ServeHTTP(w, req)
+	w := httptest.NewRecorder()
+	suite.router.ServeHTTP(w, req)
 
-// 	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, http.StatusOK, w.Code)
 
-// 	var response schemas.UserResponse
-// 	err := json.Unmarshal(w.Body.Bytes(), &response)
-// 	assert.NoError(t, err)
-// 	assert.Equal(t, "Updated Name", response.Data.Name)
-// 	assert.Equal(t, user.Email, response.Data.Email)
-// }
+	var response schemas.UserResponse
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+	assert.NoError(t, err)
+	assert.Equal(t, "Updated Name", response.Data.Name)
+	assert.Equal(t, user.Email, response.Data.Email)
+}
 
-// func TestPartialUpdateUserNotFound(t *testing.T) {
-// 	suite := NewTestSuite(t)
-// 	defer suite.TearDown()
+func TestPartialUpdateUserNotFound(t *testing.T) {
+	suite := NewTestSuite(t)
+	defer suite.TearDown()
 
-// 	requestBody := map[string]string{
-// 		"name": "Updated Name",
-// 	}
+	requestBody := map[string]string{
+		"name": "Updated Name",
+	}
 
-// 	jsonData, _ := json.Marshal(requestBody)
+	jsonData, _ := json.Marshal(requestBody)
 
-// 	req, _ := http.NewRequest("PATCH", "/users/9999", bytes.NewBuffer(jsonData))
-// 	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest("PATCH", "/users/9999", bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
 
-// 	w := httptest.NewRecorder()
-// 	suite.router.ServeHTTP(w, req)
+	w := httptest.NewRecorder()
+	suite.router.ServeHTTP(w, req)
 
-// 	assert.Equal(t, http.StatusNotFound, w.Code)
+	assert.Equal(t, http.StatusNotFound, w.Code)
 
-// 	var response schemas.ErrorResponse
-// 	err := json.Unmarshal(w.Body.Bytes(), &response)
-// 	assert.NoError(t, err)
-// 	assert.Contains(t, response.Error, "User not found")
-// }
+	var response schemas.ErrorResponse
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+	assert.NoError(t, err)
+	assert.Contains(t, response.Error, "User not found")
+}
 
-// func TestPartialUpdateUserValidationError(t *testing.T) {
-// 	suite := NewTestSuite(t)
-// 	defer suite.TearDown()
+func TestPartialUpdateUserValidationError(t *testing.T) {
+	suite := NewTestSuite(t)
+	defer suite.TearDown()
 
-// 	user := UserFactory()
+	user := UserFactory()
 
-// 	requestBody := map[string]string{
-// 		"email": "invalid-email",
-// 	}
+	requestBody := map[string]string{
+		"email": "invalid-email",
+	}
 
-// 	jsonData, _ := json.Marshal(requestBody)
+	jsonData, _ := json.Marshal(requestBody)
 
-// 	req, _ := http.NewRequest("PATCH", "/users/"+strconv.FormatUint(uint64(user.ID), 10), bytes.NewBuffer(jsonData))
-// 	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest("PATCH", "/users/"+strconv.FormatUint(uint64(user.ID), 10), bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
 
-// 	w := httptest.NewRecorder()
-// 	suite.router.ServeHTTP(w, req)
+	w := httptest.NewRecorder()
+	suite.router.ServeHTTP(w, req)
 
-// 	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
 
-// 	var response schemas.ErrorResponse
-// 	err := json.Unmarshal(w.Body.Bytes(), &response)
-// 	assert.NoError(t, err)
-// 	assert.Contains(t, response.Error, "Validation failed")
-// }
+	var response schemas.ErrorResponse
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+	assert.NoError(t, err)
+	assert.Contains(t, response.Error, "Validation failed")
+}
 
 func TestDeleteUserSuccess(t *testing.T) {
 	suite := NewTestSuite(t)

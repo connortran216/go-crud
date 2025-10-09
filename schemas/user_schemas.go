@@ -9,8 +9,8 @@ type CreateUserInput struct {
 }
 
 type PartialUpdateUserInput struct {
-	Name  *string `json:"name" example:"Connor Tran"`
-	Email *string `json:"email" validate:"email" example:"connor@example.com"`
+	Name  *string `json:"name" validate:"omitempty,min=3" example:"Connor Tran"`
+	Email *string `json:"email" validate:"omitempty,email" example:"connor@example.com"`
 	Password *string `json:"password" example:"abcxyz123"`
 }
 
